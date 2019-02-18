@@ -39,4 +39,10 @@
         delegate_to: 127.0.0.1
  
       - name: test connection (after reboot)
-        ping:
+        ping
+
+      - name: mount image folder share
+        mount: fstype="cifs"
+        opts="domain=MY_DOMAIN,username=USER,password=PASSWORD"
+        src="//network_path/folder"
+        name="/local_path/folder"        
