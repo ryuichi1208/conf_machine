@@ -1,0 +1,38 @@
+- hosts: all
+  sudo: no
+  remote_user: root
+  tasks:
+    - name: gethostname
+      shell: hostname
+      register: return_from_shell
+      changed_when: no
+    - name: show previous shell stdout
+      debug:
+        msg: "{{ return_from_shell.stdout }}"
+    - name: copy a directory
+      copy:
+        src: ./file1
+        dest: /tmp
+      copy:
+        src: ./file2
+        dest: /tmp
+    - name: package install
+      apt: name={{item}} state=present update_cache=yes
+      with_items:
+        - git
+        - vim
+        - ntp
+        - jq
+        - language-pack-ja
+        - cifs-utils
+        - curl
+#   - name: setting SELinux
+#     selinux: state=disabled
+    - name: service
+      service: name={{item}} state=started
+      with_items:
+        - NetworkManager.service
+        - ntp.service
+    - name: change timezone
+      timezone:
+        name: Asia/Tokyo
