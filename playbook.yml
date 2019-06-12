@@ -3,11 +3,6 @@
   user: root
   tasks:
 
-      - name: install the 'Development tools' package group
-        yum:
-          name: "@Development tools"
-          state: present
-
       - name: install via yum
         yum: name={{ item }} state=installed
         with_items:
