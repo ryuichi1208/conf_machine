@@ -2,7 +2,20 @@
   become: yes
   user: root
   tasks:
-
+    - name: gethostname
+      shell: hostname
+      register: return_from_shell
+      changed_when: no
+    - name: show previous shell stdout
+      debug:
+        msg: "{{ return_from_shell.stdout }}"
+    - name: copy a directory
+      copy:
+        src: ./file1
+        dest: /tmp
+      copy:
+        src: ./file2
+        dest: /tmp
       - name: install the 'Development tools' package group
         yum:
           name: "@Development tools"
