@@ -1,0 +1,46 @@
+- hosts: all
+  vars:
+    src_dir: /usr/local/src
+  tasks:
+    - name: SELinux Disabled
+      selinux: state=disabled
+      register: selinux
+
+    - name: restart machine
+      shell: sleep 2 && shutdown -r now
+      async: 1
+      poll: 0
+      become: true
+      ignore_errors: true
+
+    - name: wait for reboot
+      wait_for_connection:
+        delay: 30
+        timeout: 300
+
+    - name: install epel-release
+      yum:
+        name: epel-release
+        state: present
+
+    - name: install via yum
+      yum: name={{ item }} state=installed
+      with_items:
+        - jq
+        - git
+        - gcc
+        - lua
+        - curl
+
+    - name: get vim from GitHub
+      command: chdir={{src_dir}} git clone https://github.com/vim/vim.git
+      when: result1|failed
+
+    - name: Install vim
+      command: >
+        chdir={{ src_dir }}
+        {{ item }}
+      with_items:
+        - './configure --with-features=huge --enable-gui=gtk2 --enable-fail-if-missing'
+        - make
+        - make install
